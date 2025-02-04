@@ -1,0 +1,33 @@
+/* Add these styles to your Tailwind CSS file or component */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin-top: 20px; /* Adjust the margin as needed */
+  }
+  
+  .pagination li {
+    margin: 0 5px;
+    display: inline-block;
+  }
+  
+  .pagination a {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid #4caf50; /* Adjust the border color as needed */
+    color: #4caf50; /* Adjust the text color as needed */
+    text-decoration: none;
+  }
+  
+  .pagination .break-me a {
+    cursor: default;
+  }
+  
+  .pagination .active a {
+    background-color: #4caf50;
+    color: #fff;
+    border: 1px solid #4caf50;
+  }
+  
