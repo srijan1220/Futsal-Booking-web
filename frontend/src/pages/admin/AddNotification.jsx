@@ -68,7 +68,6 @@ const AddNotification = () => {
     return (
         <>
             <AdminNavbar />
-
             <AdminSidebar>
                 <>
                     <div className="w-full sm:px-6">
