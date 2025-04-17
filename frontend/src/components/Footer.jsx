@@ -27,12 +27,12 @@ const Footer = ()=>{
         <span className="text-xl font-medium">Contact Us</span>
         <div className="flex flex-col w-full text-neutral-700">
             <span className="mt-3 font-medium">
-                <i className="fa-solid fa-location-dot mr-2 neutral-700"></i>Kathmandu Nepal</span>
+                <i className="fa-solid fa-location-dot mr-2 neutral-700"></i>Hetauda Nepal</span>
             <span className="mt-3 font-medium">
                 <i className="fa-solid fa-phone mt-2 text-neutral-700 mr-2"></i>
-                980000000000</span>
+                9864849599</span>
             <span className="mt-3 font-medium">
-                <i class="fa-regular fa-message mt-2 text-neutral-700 mr-2"></i>FutsalNepal@gmail.com</span>
+                <i class="fa-regular fa-message mt-2 text-neutral-700 mr-2"></i>Futsalhetauda@gmail.com</span>
         </div>
     </div>
 
