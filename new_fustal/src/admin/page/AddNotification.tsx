@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
-import { createNotitificationAPI, deleteNotificationAPI, getNotitificationAPI } from "@/api/api";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  createNotitificationAPI,
+  deleteNotificationAPI,
+  getNotitificationAPI,
+} from "@/api/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toaster, toast } from "sonner";
@@ -14,7 +24,7 @@ interface User {
 }
 
 const AddNotification = () => {
-  const storedUser = localStorage.getItem('user');
+  const storedUser = localStorage.getItem("user");
   const user: User | null = storedUser ? JSON.parse(storedUser) : null;
   const id = user?._id ?? null;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,9 +36,9 @@ const AddNotification = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
 
   const fetchNotifications = () => {
-    // getNotitificationAPI().then((res) => {
-    //   setNotifications(res.data.notification || []);
-    // });
+    getNotitificationAPI(id).then((res) => {
+      setNotifications(res.data.notification);
+    });
   };
 
   useEffect(() => {
@@ -133,7 +143,7 @@ const AddNotification = () => {
             <Textarea
               placeholder="Description"
               value={description}
-              onChange={(e:any) => setDescription(e.target.value)}
+              onChange={(e: any) => setDescription(e.target.value)}
               rows={4}
               required
             />
