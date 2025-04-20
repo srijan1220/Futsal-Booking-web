@@ -129,30 +129,31 @@ const AddNotification = () => {
 
       {/* Add Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Notification</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-            <Textarea
-              placeholder="Description"
-              value={description}
-              onChange={(e: any) => setDescription(e.target.value)}
-              rows={4}
-              required
-            />
-            <DialogFooter>
-              <Button type="submit">Submit</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+  <DialogContent className="max-w-3xl w-full"> {/* 👈 adjust size here */}
+    <DialogHeader>
+      <DialogTitle>Add New Notification</DialogTitle>
+    </DialogHeader>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+      />
+      <Textarea
+        placeholder="Description"
+        value={description}
+        onChange={(e: any) => setDescription(e.target.value)}
+        rows={4}
+        required
+      />
+      <DialogFooter>
+        <Button type="submit">Submit</Button>
+      </DialogFooter>
+    </form>
+  </DialogContent>
+</Dialog>
+
 
       {/* Delete Modal */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
