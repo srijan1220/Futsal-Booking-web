@@ -8,7 +8,15 @@ import { Trash2, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 
+interface User {
+  _id: string;
+  userName: string;
+}
+
 const AddNotification = () => {
+  const storedUser = localStorage.getItem('user');
+  const user: User | null = storedUser ? JSON.parse(storedUser) : null;
+  const id = user?._id ?? null;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);

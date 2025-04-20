@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -13,6 +13,18 @@ import {
 } from "@/components/ui/sidebar";
 
 function Layout() {
+  const location = useLocation();
+  const getPageTitle = () => {
+    if (location.pathname === "/") {
+      return "Dashboard";
+    }
+
+    // Extract last part of path and capitalize
+    const path = location.pathname.split("/").filter(Boolean).pop();
+    if (!path) return "Dashboard";
+
+    return path.charAt(0).toUpperCase() + path.slice(1);
+  };
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -24,7 +36,7 @@ function Layout() {
             <Breadcrumb>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink href="#">
-                  Building Your Application
+                  {getPageTitle()}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </Breadcrumb>
