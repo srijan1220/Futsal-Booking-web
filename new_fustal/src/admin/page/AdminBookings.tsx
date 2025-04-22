@@ -1,10 +1,20 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent } from "react";
 
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Table, TableHeader, TableRow, TableCell, TableBody } from '@/components/ui/table';
-import { approveBookingApi, rejectBookingApi, getBookingbyfutsalid } from '@/api/api';
-import { toast } from 'sonner';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody,
+} from "@/components/ui/table";
+import {
+  approveBookingApi,
+  rejectBookingApi,
+  getBookingbyfutsalid,
+} from "@/api/api";
+import { toast } from "sonner";
 
 interface User {
   _id: string;
@@ -21,43 +31,45 @@ interface Booking {
   futsal: Futsal;
   date: string;
   from: string;
-  approvalStatus: 'pending' | 'approved' | 'rejected';
+  approvalStatus: "pending" | "approved" | "rejected";
 }
 
 const AdminBookings: React.FC = () => {
-  const storedUser = localStorage.getItem('user');
+  const storedUser = localStorage.getItem("user");
   const user: User | null = storedUser ? JSON.parse(storedUser) : null;
   const id = user?._id ?? null;
 
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string>("");
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
-  const formatDate = (isoDate: string): string => isoDate.split('T')[0];
+  const formatDate = (isoDate: string): string => isoDate.split("T")[0];
 
   const handleApprove = async (bookingId: string) => {
     try {
       const res = await approveBookingApi(bookingId);
       if (res.data.success) {
-        setBookings(prev =>
-          prev.map(booking =>
-            booking._id === bookingId ? { ...booking, approvalStatus: 'approved' } : booking
+        setBookings((prev) =>
+          prev.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, approvalStatus: "approved" }
+              : booking
           )
         );
-        toast('Booking Approved');
+        toast("Booking Approved");
       } else {
-        toast('Approval Failed', {
+        toast("Approval Failed", {
           description: res.data.message,
         });
       }
     } catch (error) {
-      console.error('API call failed:', error);
-      toast('Error', {
-        description: 'API call failed',
+      console.error("API call failed:", error);
+      toast("Error", {
+        description: "API call failed",
       });
     }
   };
@@ -66,21 +78,23 @@ const AdminBookings: React.FC = () => {
     try {
       const res = await rejectBookingApi(bookingId);
       if (res.data.success) {
-        setBookings(prev =>
-          prev.map(booking =>
-            booking._id === bookingId ? { ...booking, approvalStatus: 'rejected' } : booking
+        setBookings((prev) =>
+          prev.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, approvalStatus: "rejected" }
+              : booking
           )
         );
-        toast('Booking Rejected');
+        toast("Booking Rejected");
       } else {
-        toast('Rejection Failed', {
+        toast("Rejection Failed", {
           description: res.data.message,
         });
       }
     } catch (error) {
-      console.error('API call failed:', error);
-      toast('Error', {
-        description: 'API call failed',
+      console.error("API call failed:", error);
+      toast("Error", {
+        description: "API call failed",
       });
     }
   };
@@ -104,11 +118,11 @@ const AdminBookings: React.FC = () => {
           if (res.data.success) {
             setBookings(res.data.bookings);
           } else {
-            console.error('Error fetching bookings:', res.data.error);
+            console.error("Error fetching bookings:", res.data.error);
           }
         })
         .catch((err: any) => {
-          console.error('API call failed:', err);
+          console.error("API call failed:", err);
         });
     }
   }, [id]);
@@ -117,7 +131,9 @@ const AdminBookings: React.FC = () => {
     <>
       <div className="px-4 md:px-10 py-4 md:py-7 bg-gray-100 rounded-tl-lg rounded-tr-lg">
         <div className="sm:flex items-center justify-between">
-          <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800">Bookings</p>
+          <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800">
+            Bookings
+          </p>
           <div className="flex items-center gap-2">
             <Input
               type="date"
@@ -139,22 +155,43 @@ const AdminBookings: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell className="pl-4 font-normal text-left">User Name</TableCell>
-              <TableCell className="pl-12 font-normal text-left">Futsal Name</TableCell>
-              <TableCell className="pl-12 font-normal text-left">Date</TableCell>
-              <TableCell className="pl-20 font-normal text-left">Time</TableCell>
-              <TableCell className="pl-16 font-normal text-left">Action</TableCell>
+              <TableCell className="pl-4 font-normal text-left">
+                User Name
+              </TableCell>
+              <TableCell className="pl-12 font-normal text-left">
+                Futsal Name
+              </TableCell>
+              <TableCell className="pl-12 font-normal text-left">
+                Date
+              </TableCell>
+              <TableCell className="pl-20 font-normal text-left">
+                Time
+              </TableCell>
+              <TableCell className="pl-16 font-normal text-left">
+                Action
+              </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredBookings.map((booking) => (
-              <TableRow key={booking._id} className="text-sm text-gray-800 bg-white hover:bg-gray-100">
-                <TableCell className="pl-4 font-medium">{booking.user?.userName}</TableCell>
-                <TableCell className="pl-12 font-medium">{booking.futsal?.futsalName}</TableCell>
-                <TableCell className="pl-12 font-medium">{formatDate(booking.date)}</TableCell>
-                <TableCell className="pl-20 font-medium">{booking.from}</TableCell>
+              <TableRow
+                key={booking._id}
+                className="text-sm text-gray-800 bg-white hover:bg-gray-100"
+              >
+                <TableCell className="pl-4 font-medium">
+                  {booking.user?.userName}
+                </TableCell>
+                <TableCell className="pl-12 font-medium">
+                  {booking.futsal?.futsalName}
+                </TableCell>
+                <TableCell className="pl-12 font-medium">
+                  {formatDate(booking.date)}
+                </TableCell>
+                <TableCell className="pl-20 font-medium">
+                  {booking.from}
+                </TableCell>
                 <TableCell className="px-7 2xl:px-0">
-                  {booking.approvalStatus === 'pending' && (
+                  {booking.approvalStatus === "pending" && (
                     <div className="flex">
                       <Button
                         variant="outline"
@@ -172,18 +209,38 @@ const AdminBookings: React.FC = () => {
                       </Button>
                     </div>
                   )}
-                  {booking.approvalStatus === 'approved' && (
+                  {booking.approvalStatus === "approved" && (
                     <div className="flex items-center text-green-500">
-                      <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-6 h-6 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       Approved
                     </div>
                   )}
-                  {booking.approvalStatus === 'rejected' && (
+                  {booking.approvalStatus === "rejected" && (
                     <div className="flex items-center text-red-500">
-                      <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-6 h-6 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                       Rejected
                     </div>
