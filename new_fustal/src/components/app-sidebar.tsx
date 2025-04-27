@@ -3,6 +3,7 @@ import {
   IconDashboard,
   IconInnerShadowTop,
   IconListDetails,
+  IconMagnet,
   IconNotification,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
@@ -28,6 +29,11 @@ const data = {
       title: "Dashboard",
       url: "/",
       icon: IconDashboard,
+    },
+    {
+      title: "Fustal",
+      url: "/fustal",
+      icon: IconMagnet,
     },
     {
       title: "Notification",
