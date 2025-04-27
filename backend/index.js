@@ -49,6 +49,8 @@ app.use("/api/booking", require("./routes/bookingRoutes"));
 
 app.use("/api/notification", require("./routes/notificationRoutes"));
 app.use("/api/review", require("./routes/reviewRoutes"));
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+
 
 const server = http.createServer(app);
 const socketInfo = mysocket(server);
