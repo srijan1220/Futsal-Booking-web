@@ -9,26 +9,47 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const pieData = [
-  { name: "Completed", value: 400 },
-  { name: "Pending", value: 200 },
-  { name: "Cancelled", value: 100 },
-];
-
-const barData = [
-  { day: "Sun", bookings: 30 },
-  { day: "Mon", bookings: 50 },
-  { day: "Tue", bookings: 45 },
-  { day: "Wed", bookings: 70 },
-  { day: "Thu", bookings: 60 },
-  { day: "Fri", bookings: 80 },
-  { day: "Sat", bookings: 90 },
-];
+import { useEffect, useState } from "react";
 
 const COLORS = ["#22c55e", "#eab308", "#ef4444"];
 
 export const ChartOverview = () => {
+  const [pieData, setPieData] = useState([]);
+  const [barData, setBarData] = useState([]);
+
+  useEffect(() => {
+    const fetchPieData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/dashboard/getbooking"
+        );
+        const result = await response.json();
+        if (result.success) {
+          setPieData(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch pie chart data", error);
+      }
+    };
+
+    const fetchBarData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/dashboard/getweeklybooking"
+        );
+        const result = await response.json();
+        if (result.success) {
+          setBarData(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch bar chart data", error);
+      }
+    };
+
+    fetchPieData();
+    fetchBarData();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:px-6">
       {/* Pie Chart */}
