@@ -15,16 +15,34 @@ import {
 function Layout() {
   const location = useLocation();
   const getPageTitle = () => {
-    if (location.pathname === "/") {
-      return "Dashboard";
+    const pathParts = location.pathname.split("/").filter(Boolean);
+
+    if (pathParts.length === 0) {
+      return "Landing Page"; // If the user is on "/"
     }
 
-    // Extract last part of path and capitalize
-    const path = location.pathname.split("/").filter(Boolean).pop();
-    if (!path) return "Dashboard";
+    if (pathParts[0] === "admin") {
+      if (pathParts.length === 1) {
+        return "Dashbaord"; // "/admin"
+      }
+      const page = pathParts[1];
+      switch (page) {
+        case "futsal":
+          return "Futsal";
+        case "notification":
+          return "Notification";
+        case "booking":
+          return "Bookings";
+        default:
+          return page.charAt(0).toUpperCase() + page.slice(1);
+      }
+    }
 
-    return path.charAt(0).toUpperCase() + path.slice(1);
+    // For login, register, forgetpassword, etc.
+    const page = pathParts[0];
+    return page.charAt(0).toUpperCase() + page.slice(1);
   };
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -35,9 +53,7 @@ function Layout() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  {getPageTitle()}
-                </BreadcrumbLink>
+                <BreadcrumbLink href="#">{getPageTitle()}</BreadcrumbLink>
               </BreadcrumbItem>
             </Breadcrumb>
           </div>

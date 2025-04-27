@@ -27,22 +27,22 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/",
+      url: "/admin", // because your Admin Dashboard is at /admin/futsal
       icon: IconDashboard,
     },
     {
-      title: "Fustal",
-      url: "/fustal",
+      title: "Futsal",
+      url: "/admin/futsal", // HomePage under /admin
       icon: IconMagnet,
     },
     {
       title: "Notification",
-      url: "/notification",
+      url: "/admin/notification", // AddNotification
       icon: IconNotification,
     },
     {
       title: "Bookings",
-      url: "/booking",
+      url: "/admin/booking", // AdminBookings
       icon: IconListDetails,
     },
   ],
