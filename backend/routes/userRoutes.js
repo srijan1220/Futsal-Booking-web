@@ -4,13 +4,12 @@ const userController = require("../controllers/userControllers")
 
 // create user api
 router.post('/create', userController.createUser)
+router.get('/get_all', userController.createAdmin)
 
 //  task 1: create login api
 router.post('/login', userController.loginUser)
 
 router.get("/get_user/:id", userController.getSingleUser)
-
-
 
 // update the user
 router.put('/update_user/:id', userController.updateUser);

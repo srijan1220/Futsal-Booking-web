@@ -4,6 +4,56 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
+const createAdmin = async (req, res) => {
+  try {
+    
+    
+    // Predefined values for admin
+    const userName = "admin";
+    const password = "admin123"; // You can change this to whatever is needed
+    const email = "admin@gmail.com";
+    const phoneNumber = "1234567890"; // You can change this to whatever is needed
+    
+    // Check if the user already exists
+    const existingUser = await Users.findOne({ email: email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin user already exists",
+      });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create a new admin user
+    const newUser = new Users({
+      userName,
+      phoneNumber,
+      email,
+      password: hashedPassword,
+      isAdmin: true, // Set isAdmin to true for admin users
+    });
+    
+    // Save the new user
+    await newUser.save();
+
+    // Send a success response
+    res.status(201).json({
+      success: true,
+      message: "Admin user created successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+
 const sendEmail = async (to, subject, text) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
