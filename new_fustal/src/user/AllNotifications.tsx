@@ -1,13 +1,22 @@
 // Notifications.js
 
 import { getUserNotificaitonAPI } from '@/api/api';
+
 import { useEffect, useState } from 'react';
+import LandingNavbar from './landingNavBar';
+
 
 
 const AllNotifications = () => {
   const user = JSON.parse(localStorage.getItem('user') || 'null')
   const userId = user ? user._id : null;
-  const [notifications, setNotifications] = useState([]);
+  interface Notification {
+    _id: string;
+    title: string;
+    description: string;
+  }
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     // Fetch all notifications when the component mounts
@@ -22,7 +31,7 @@ const AllNotifications = () => {
 
   return (
     <>
-      <Navbar />
+      <LandingNavbar/>
       <div className="min-h-screen bg-white p-5">
         <h1 className="text-3xl font-semibold mb-4">All Notifications</h1>
         <ul className="space-y-4">
@@ -36,7 +45,6 @@ const AllNotifications = () => {
           ))}
         </ul>
       </div>
-      <Footer />
     </>
   );
 };

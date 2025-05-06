@@ -33,7 +33,7 @@ function App() {
     <Router>
       <ToastContainer />
       <Routes>
-        <Route path="/navbar" element={<Navbar />} /> this
+        <Route path="/navbar" element={<Navbar />} />
         <Route path="/landingnavbar" element={<LandingNavbar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/landingfooter" element={<LandingFooter />} />

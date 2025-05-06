@@ -3,13 +3,12 @@ import axios from "axios";
 const Api = axios.create({
   baseURL: "http://localhost:5000",
   withCredentials: true,
-
   headers: {
     "Content-Type": "multipart/form-data",
   },
 });
 
-// make seperate header for authorization
+// Make separate header for authorization
 const token = localStorage.getItem("token");
 
 const config = {
@@ -18,92 +17,73 @@ const config = {
   },
 };
 
+// Test API
 export const testApi = () => Api.get("/test");
 
-// "http://localhost:5000/test"(backend route)
-// create user api
-
-export const createUserApi = (data) => Api.post("api/user/create", data);
-export const loginUserApi = (data) => Api.post("api/user/login", data);
-export const updateUserApi = (id, data) =>
+// User APIs
+export const createUserApi = (data: any) => Api.post("/api/user/create", data);
+export const loginUserApi = (data: any) => Api.post("/api/user/login", data);
+export const updateUserApi = (id: string, data: any) =>
   Api.put(`/api/user/update_user/${id}`, data);
-export const getSingleUserApi = (id) => Api.get(`/api/user/get_user/${id}`);
-export const forgetPasswordAPI = (data) =>
+export const getSingleUserApi = (id: string) =>
+  Api.get(`/api/user/get_user/${id}`);
+export const forgetPasswordAPI = (data: any) =>
   Api.post("/api/user/forgetpassword", data);
 
-// Create product API
-export const createFutsalApi = (data) =>
+// Futsal APIs
+export const createFutsalApi = (data: any) =>
   Api.post("/api/futsal/create_futsal", data, config);
-
-// get all products
 export const getAllFutsalsApi = () => Api.get("/api/futsal/get_futsals");
-
-// get single product api
-
-export const getFutsalUserIdApi = (id) =>
+export const getFutsalUserIdApi = (id: string) =>
   Api.get(`/api/futsal/getfutsalbyUser/${id}`);
-
-export const getSingleFutsalApi = (id) =>
+export const getSingleFutsalApi = (id: string) =>
   Api.get(`/api/futsal/get_futsals/${id}`);
-
-// update product API with ID
-export const updateFutsalAPI = (id, formData) =>
+export const updateFutsalAPI = (id: string, formData: any) =>
   Api.put(`/api/futsal/update_futsal/${id}`, formData, config);
-
-// delete product with id
-export const deleteFutsalAPI = (id) =>
+export const deleteFutsalAPI = (id: string) =>
   Api.delete(`/api/futsal/delete_futsal/${id}`, config);
-// get booking by user id
-export const getUserFutsalBookingApi = (userId) =>
-  Api.get(`api/booking/getbookingUserId/${userId}`);
-export const getBookingbyfutsalid = (id) =>
-  Api.get(`api/booking/getbookingbyfutsalid/${id}`);
 
-// create booking api
-export const createBookingApi = (data) =>
+// Booking APIs
+export const getUserFutsalBookingApi = (userId: string) =>
+  Api.get(`/api/booking/getbookingUserId/${userId}`);
+export const getBookingbyfutsalid = (id: string) =>
+  Api.get(`/api/booking/getbookingbyfutsalid/${id}`);
+export const createBookingApi = (data: any) =>
   Api.post("/api/booking/create_booking", data);
-
-// get all booking api
-
 export const getAllBookingApi = () => Api.get("/api/booking/get_allbooking");
-
-// for approve and reject booking
-export const approveBookingApi = (bookingId) =>
+export const approveBookingApi = (bookingId: string) =>
   Api.put(`/api/booking/approve_booking/${bookingId}`, {}, config);
-
-export const deleteBookingAPi = (id) =>
-  Api.delete(`/api/booking/delete_booking/${id}`);
-
-export const rejectBookingApi = (bookingId) =>
+export const rejectBookingApi = (bookingId: string) =>
   Api.put(`/api/booking/reject_booking/${bookingId}`, {}, config);
-
-export const updateBookingApi = (id, data) =>
-  Api.put(`/api/booking//update_booking/${id}`, data);
-export const getAvailableTimeSlotsApi = (id, date) =>
+export const deleteBookingAPi = (id: string) =>
+  Api.delete(`/api/booking/delete_booking/${id}`);
+export const updateBookingApi = (id: string, data: any) =>
+  Api.put(`/api/booking/update_booking/${id}`, data);
+export const getAvailableTimeSlotsApi = (id: string, date: string) =>
   Api.get(`/api/booking/getbookedslot/${id}/${date}`);
-export const getSingleBookingApi = (id) =>
+export const getSingleBookingApi = (id: string) =>
   Api.get(`/api/booking/get_singlebooking/${id}`);
 
-// notificaton apis
-export const createNotitificationAPI = (data) =>
+// Notification APIs
+export const createNotitificationAPI = (data: any) =>
   Api.post("/api/notification/createnotification", data, config);
-export const getNotitificationAPI = (id) =>
+export const getNotitificationAPI = (id: string) =>
   Api.get(`/api/notification/get_notification/${id}`);
-export const updateNotitificationAPI = (id, formData) =>
+export const updateNotitificationAPI = (id: string, formData: any) =>
   Api.put(`/api/notification/update_notification/${id}`, formData, config);
-export const getSingleNotificationAPI = (id) =>
+export const getSingleNotificationAPI = (id: string) =>
   Api.get(`/api/notification/getsinglenotification/${id}`);
-export const getUserNotificaitonAPI = (userId) =>
+export const getUserNotificaitonAPI = (userId: string) =>
   Api.get(`/api/notification/usernotification/${userId}`);
-export const deleteNotificationAPI = (id) =>
+export const deleteNotificationAPI = (id: string) =>
   Api.delete(`/api/notification/delete_notification/${id}`, config);
 
-// review apis
-export const createReviewApi = (data) =>
-  Api.post("api/review/create_review", data);
-export const getReviewsByFutsalIdApi = (futsalId) =>
-  Api.get(`api/review/getreviews/${futsalId}`);
-export const deleteReviewApi = (reviewId) =>
-  Api.delete(`api/review/deletereview/${reviewId}`);
-export const getAvgRatingApi = (futsalId) =>
-  Api.get(`api/review//averageRating/${futsalId}`);
+// Review APIs
+export const createReviewApi = (data: any) =>
+  Api.post("/api/review/create_review", data);
+export const getReviewsByFutsalIdApi = (futsalId: string) =>
+  Api.get(`/api/review/getreviews/${futsalId}`);
+export const deleteReviewApi = (reviewId: string) =>
+  Api.delete(`/api/review/deletereview/${reviewId}`);
+export const getAvgRatingApi = (futsalId: string) =>
+  Api.get(`/api/review/averageRating/${futsalId}`);

@@ -1,12 +1,24 @@
 import "leaflet/dist/leaflet.css";
 import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { LatLngExpression } from "leaflet";
 import { useParams } from "react-router-dom";
-import { fetchSingleBloodBankApi } from "../../../apis/api";
+
 
 const SingleBloodbank = () => {
   const { id } = useParams();
-  const [bloodbank, setBloodbank] = useState("");
+  const [bloodbank, setBloodbank] = useState<{
+    bbName: string;
+    bbAddress: string;
+    bbContact: string;
+    socialMediaLinks: string;
+    operatingHours: string;
+    serviceOffered: string;
+    specialInstructions: string;
+    additionalNotes: string;
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
     fetchSingleBloodBankApi(id).then((res) => {
@@ -58,16 +70,15 @@ const SingleBloodbank = () => {
           <div className="row">
             <div className="col-12 p-0">
               <MapContainer
-                className=""
-                center={[bloodbank.latitude, bloodbank.longitude]}
+                center={[bloodbank.latitude, bloodbank.longitude] as LatLngExpression}
                 zoom={25}
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <Marker position={[bloodbank.latitude, bloodbank.longitude]}>
                   <Popup>
                     <div>
-                      <h3>{bloodbank.bloodbankName}</h3>
-                      <p>{bloodbank.bloodbankAddress}</p>
+                      <h3>{bloodbank.bbName}</h3>
+                      <p>{bloodbank.bbAddress}</p>
                     </div>
                   </Popup>
                 </Marker>
@@ -81,3 +92,27 @@ const SingleBloodbank = () => {
 };
 
 export default SingleBloodbank;
+function fetchSingleBloodBankApi(id: string | undefined): Promise<{ data: { bloodbank: any } }> {
+  // Replace the following mock implementation with your actual API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: {
+          bloodbank: {
+            bbName: "Sample Bloodbank",
+            bbAddress: "123 Main St",
+            bbContact: "123-456-7890",
+            socialMediaLinks: "http://example.com",
+            operatingHours: "9 AM - 5 PM",
+            serviceOffered: "Blood Donation",
+            specialInstructions: "Bring ID",
+            additionalNotes: "Open on weekends",
+            latitude: 27.7172,
+            longitude: 85.3240,
+          },
+        },
+      });
+    }, 1000);
+  });
+}
+
