@@ -23,8 +23,7 @@ const Login = () => {
       userName: Yup.string().required("Username is required"),
       password: Yup.string().required("Password is required"),
     }),
-    onSubmit: (values) => {
-      navigate("/admin/futsal");
+    onSubmit: (values:any) => {
       loginUserApi(values)
         .then((res: any) => {
           if (res.data.success === false) {

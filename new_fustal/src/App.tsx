@@ -10,6 +10,11 @@ import Login from "./app/Login";
 import Signup from "./app/Signup";
 import ForgetPassword from "./app/ForgetPassword";
 import Landing from "./app/LandingPage";
+import Dashboard from "./user/Dashboard";
+import BookingForm from "./user/BookingForm";
+import EditMybookings from "./user/EditMybookings";
+import AllNotifications from "./user/AllNotifications";
+import UserRoutes from "./protectedroutes/UserRoutes";
 
 function App() {
   return (
@@ -20,7 +25,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
-        
+
+        <Route element={<UserRoutes />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/booking/:id" element={<BookingForm />} />
+          <Route path="/mybooking" element={<MyBookings />} />
+          <Route path="/myedit/:id" element={<EditMybookings />} />
+          <Route path="/allnotification" element={<AllNotifications />} />
+        </Route>
 
         {/* Admin Routes */}
         <Route path="/admin/" element={<Layout />}>
