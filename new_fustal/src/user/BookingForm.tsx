@@ -5,9 +5,9 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
-import { createBookingApi, createReviewApi, getAvailableTimeSlotsApi, getAvgRatingApi, getReviewsByFutsalIdApi, getSingleFutsalApi } from '../apis/api';
+import { createBookingApi, createReviewApi, getAvailableTimeSlotsApi, getAvgRatingApi, getReviewsByFutsalIdApi, getSingleFutsalApi } from '../api/api';
 import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
+import Navbar from '@/components/Navbar';
 
 const BookingForm = () => {
     const { id } = useParams();
@@ -22,7 +22,9 @@ const BookingForm = () => {
     const [validOptions, setValidOptions] = useState([]);
     const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    //const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+
     let availableTime = [
         '6:00-7:00',
         '7:00-8:00',
@@ -40,16 +42,17 @@ const BookingForm = () => {
         '19:00-20:00',
     ]
 
-    var timeOptions = [
+    //var timeOptions = [];
+    let timeOptions: { value: string; label: string }[] = [];
 
-    ];
 
     const [rating, setRating] = useState(0);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [reviewText, setReviewText] = useState('');
 
 
-    const handleStarClick = (selectedRating) => {
+    //const handleStarClick = (selectedRating) =>
+    const handleRatingChange = (selectedRating: number) =>  {
         setRating(selectedRating);
     };
 

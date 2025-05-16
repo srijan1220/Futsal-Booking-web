@@ -3,7 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const user = JSON.parse(localStorage.getItem('user'));
+//const user = JSON.parse(localStorage.getItem('user'));
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
 
 const LandingNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,21 +16,23 @@ const LandingNavbar = () => {
   const closelogoutModal = () => setlogoutIsModalOpen(false);
 
   // Close the user menu when clicking outside
+  
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setIsUserMenuOpen(false);
+    function handleClickOutside(event: MouseEvent) {
+        if (userMenuRef.current && !(userMenuRef.current as HTMLElement).contains(event.target as Node)) {
+          setIsUserMenuOpen(false);
       }
-    }
+   }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [userMenuRef]);
+   
 
   const navigate = useNavigate();
 
-  const handleDelete = (e) => {
+  const handleDelete = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     navigate('/');
@@ -65,7 +69,7 @@ const LandingNavbar = () => {
               Hello {user.userName}
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-50">
-                  <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-300" to={'/update'}>
+                  <Link to="/update" className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition duration-300" >
                     Profile
                   </Link>
                   <button

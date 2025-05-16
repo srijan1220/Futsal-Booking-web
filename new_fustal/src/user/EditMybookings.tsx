@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
-import { getSingleBookingApi, updateBookingApi } from '../apis/api';
+import { getSingleBookingApi, updateBookingApi } from '../api/api';
 
 const EditMybookings = () => {
     const { id } = useParams();
@@ -37,7 +37,7 @@ const EditMybookings = () => {
         const today = new Date();
         const formattedToday = today.toISOString().split('T')[0];
         setMinDate(formattedToday);
-
+        if(id!=null){
         getSingleBookingApi(id).then((res) => {
             setFutsalName(res.data.booking.futsal.futsalName);
             setFutsalPrice(res.data.booking.futsal.futsalPrice);
@@ -50,6 +50,9 @@ const EditMybookings = () => {
                 setSelectedTimes([{ value: fromData, label: fromData }]);
             }
         });
+
+        }
+
     }, [id]);
 
     useEffect(() => {

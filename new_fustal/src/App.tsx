@@ -13,6 +13,7 @@ import Landing from "./app/LandingPage";
 import Dashboard from "./user/Dashboard";
 import BookingForm from "./user/BookingForm";
 import EditMybookings from "./user/EditMybookings";
+import MyBookings from "./user/MyBookings";
 import AllNotifications from "./user/AllNotifications";
 import UserRoutes from "./protectedroutes/UserRoutes";
 
