@@ -1,9 +1,9 @@
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useNavigate, useParams } from 'react-router-dom';
-import Select from 'react-select';
+import Select, { ActionMeta, MultiValue } from 'react-select';
 import { toast } from 'react-toastify';
 import { createBookingApi, createReviewApi, getAvailableTimeSlotsApi, getAvgRatingApi, getReviewsByFutsalIdApi, getSingleFutsalApi } from '../api/api';
 import Footer from '../components/Footer';
@@ -13,13 +13,25 @@ const BookingForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [futsal, setFutsal] = useState([]);
+    interface Futsal {
+        futsalImageUrl?: string;
+        futsalName?: string;
+        futsalLocation?: string;
+        futsalPrice?: number;
+        futsalDescription?: string;
+        futsalContact?: string;
+        latitude?: number;
+        longitude?: number;
+        [key: string]: any; // for any additional properties
+    }
+
+    const [futsal, setFutsal] = useState<Futsal>({});
     const [date, setDate] = useState('');
-    const [selectedTimes, setSelectedTimes] = useState([]);
+    const [selectedTimes, setSelectedTimes] = useState<{ value: string; label: string }[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [minDate, setMinDate] = useState('');
     const [futsalName, setFutsalName] = useState('');
-    const [validOptions, setValidOptions] = useState([]);
+    const [validOptions, setValidOptions] = useState<{ value: string; label: string }[]>([]);
     const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 
     //const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -51,12 +63,18 @@ const BookingForm = () => {
     const [reviewText, setReviewText] = useState('');
 
 
-    //const handleStarClick = (selectedRating) =>
-    const handleRatingChange = (selectedRating: number) =>  {
+    const handleStarClick = (selectedRating: number) =>  {
         setRating(selectedRating);
     };
 
-    const [reviews, setReviews] = useState([]);
+    interface Review {
+        _id: string;
+        user: { userName: string };
+        rating: number;
+        review: string;
+        [key: string]: any;
+    }
+    const [reviews, setReviews] = useState<Review[]>([]);
 
     const defaultIcon = L.icon({
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/svgs/solid/map-marker.svg',
@@ -72,7 +90,7 @@ const BookingForm = () => {
             getReviewsByFutsalIdApi(id)
                 .then((res) => {
                     // Sort reviews by date in descending order
-                    const sortedReviews = res.data.reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    const sortedReviews = res.data.reviews.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
                     setReviews(sortedReviews);
                 })
                 .catch((error) => {
@@ -81,7 +99,7 @@ const BookingForm = () => {
         }
     }, [id]);
 
-    const [avgRating, setAvgRating] = useState(null); // New state to store average rating
+    const [avgRating, setAvgRating] = useState<number | null>(null); // New state to store average rating
 
     useEffect(() => {
         // Fetch average rating when the component mounts
@@ -139,21 +157,25 @@ const BookingForm = () => {
         }
     }, [id, date]);
 
-    const handleTimeChange = (selectedOptions) => {
-        setSelectedTimes(selectedOptions);
+
+    
+    const handleTimeChange = (
+        selectedOptions: MultiValue<{ value: string; label: string }>,
+        _actionMeta: ActionMeta<{ value: string; label: string }>
+    ) => {
+        setSelectedTimes(Array.isArray(selectedOptions) ? [...selectedOptions] : []);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e:any) => {
         e.preventDefault();
         setIsModalOpen(true);
     };
 
     const confirmBooking = () => {
         setIsModalOpen(false);
-
         const formData = new FormData();
         formData.append('user', storedUser._id);
-        formData.append('futsal', id);
+        formData.append('futsal', id ?? '');
         formData.append('futsalName', futsalName);
         formData.append('date', date);
         const times = selectedTimes.map(option => option.value);
@@ -332,7 +354,7 @@ const BookingForm = () => {
 
                         {reviews.length > 0 ? (
                             reviews.slice(0, 4).reverse().map((review) => (
-                                <div key={review._id} className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 p-2">
+                                <div key={review?._id} className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 p-2">
                                     <div className="border-2 border-solid border-gray-300 p-4 rounded-lg">
                                         <p className='font-semibold'>{review.user.userName}</p>
                                         <div className="flex items-center mb-2">
@@ -362,26 +384,27 @@ const BookingForm = () => {
                 </div>
 
                 {
-                    futsal?.latitude && <MapContainer
-                        className="h-[500px] w-full mt-6"
-                        center={[futsal?.latitude, futsal?.longitude]}
-                        zoom={25}
-                    >
-                        <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />   
-                        <Marker position={[futsal?.latitude, futsal?.longitude]} icon={defaultIcon}>
-                            <Popup>
-                                <div>
-                                    <h1>{futsal.futsalName}</h1>
-                                    <p>{futsal.futsalLocation}</p>
-                                    <img src={futsal.futsalImageUrl} alt={futsal.futsalName} />
-                                </div>
-                            </Popup>
-                        </Marker>
-                    </MapContainer>
-
+                    futsal?.latitude !== undefined && futsal?.longitude !== undefined && (
+                        <MapContainer
+                            className="h-[500px] w-full mt-6"
+                            center={[futsal.latitude, futsal.longitude]}
+                            zoom={25}
+                        >
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />   
+                            <Marker position={[futsal.latitude, futsal.longitude]} icon={defaultIcon}>
+                                <Popup>
+                                    <div>
+                                        <h1>{futsal.futsalName}</h1>
+                                        <p>{futsal.futsalLocation}</p>
+                                        <img src={futsal.futsalImageUrl} alt={futsal.futsalName} />
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        </MapContainer>
+                    )
                 }
 
 
