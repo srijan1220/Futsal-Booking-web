@@ -20,10 +20,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -51,6 +47,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
 
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -95,7 +92,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

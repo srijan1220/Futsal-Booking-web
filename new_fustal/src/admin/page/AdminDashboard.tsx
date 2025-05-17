@@ -47,7 +47,6 @@ const AdminDashboard = () => {
     item.futsalPrice.toString().toLowerCase().includes(searchQuery)
   );
 
-  const totalPages = Math.ceil(filteredFutsals.length / itemsPerPage);
   const slicedData = filteredFutsals.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage

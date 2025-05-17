@@ -17,6 +17,10 @@ const EditNotification = () => {
 
   useEffect(() => {
     const fetchNotification = async () => {
+      if (!id) {
+        toast.error("Invalid notification ID");
+        return;
+      }
       try {
         const res = await getSingleNotificationAPI(id);
         setTitle(res?.data?.notification?.title || "");
@@ -36,6 +40,10 @@ const EditNotification = () => {
     formData.append("description", description);
 
     try {
+      if (!id) {
+        toast.error("Invalid notification ID");
+        return;
+      }
       const res = await updateNotitificationAPI(id, formData);
       if (res.data.success) {
         toast.success("Notification updated successfully!");

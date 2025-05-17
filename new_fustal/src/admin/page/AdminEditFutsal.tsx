@@ -33,18 +33,20 @@ const AdminEditFutsal = () => {
   const [oldImage, setOldImage] = useState("");
 
   useEffect(() => {
-    getSingleFutsalApi(id).then((res) => {
-      const data = res.data.futsal;
-      setFutsalName(data.futsalName);
-      setFutsalPrice(data.futsalPrice);
-      setFutsalContact(data.futsalContact);
-      setFutsalCategory(data.futsalCategory);
-      setFutsalDescription(data.futsalDescription);
-      setFutsalLocation(data.futsalLocation);
-      setLatitude(data.latitude);
-      setLongitude(data.longitude);
-      setOldImage(data.futsalImageUrl);
-    });
+    if (id) {
+      getSingleFutsalApi(id).then((res) => {
+        const data = res.data.futsal;
+        setFutsalName(data.futsalName);
+        setFutsalPrice(data.futsalPrice);
+        setFutsalContact(data.futsalContact);
+        setFutsalCategory(data.futsalCategory);
+        setFutsalDescription(data.futsalDescription);
+        setFutsalLocation(data.futsalLocation);
+        setLatitude(data.latitude);
+        setLongitude(data.longitude);
+        setOldImage(data.futsalImageUrl);
+      });
+    }
   }, [id]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +73,10 @@ const AdminEditFutsal = () => {
     }
 
     try {
+      if (!id) {
+        toast.error("Invalid futsal ID.");
+        return;
+      }
       const res = await updateFutsalAPI(id, formData);
       if (res.data.success) {
         toast.success(res.data.message);
