@@ -6,7 +6,6 @@ import {
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -33,7 +32,7 @@ const AdminDashboard = () => {
   const [imagePreview, setPreviewImage] = useState<string | null>(null);
 
   const [futsals, setFutsals] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage] = useState(0);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -48,7 +47,6 @@ const AdminDashboard = () => {
     item.futsalPrice.toString().toLowerCase().includes(searchQuery)
   );
 
-  const totalPages = Math.ceil(filteredFutsals.length / itemsPerPage);
   const slicedData = filteredFutsals.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage

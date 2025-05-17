@@ -37,7 +37,7 @@ const Login = () => {
             localStorage.setItem("user", JSON.stringify(userData));
 
             if (userData.isAdmin) {
-              navigate("/admin/futsal");
+              navigate("/admin/");
               window.location.reload();
             } else {
               navigate("/dashboard");
@@ -96,7 +96,9 @@ const Login = () => {
               />
               {formik.touched.userName && formik.errors.userName && (
                 <p className="text-red-500 text-sm mt-1">
-                  {formik.errors.userName}
+                  {typeof formik.errors.userName === "string"
+                    ? formik.errors.userName
+                    : null}
                 </p>
               )}
             </div>
@@ -134,7 +136,7 @@ const Login = () => {
                   </span>
                 </button>
               </div>
-              {formik.touched.password && formik.errors.password && (
+              {formik.touched.password && formik.errors.password && typeof formik.errors.password === "string" && (
                 <p className="text-red-500 text-sm">{formik.errors.password}</p>
               )}
             </div>
