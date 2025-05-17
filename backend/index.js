@@ -9,7 +9,7 @@ const multiparty = require("connect-multiparty");
 const cloudinary = require("cloudinary");
 const mysocket = require("./socket/main");
 const http = require("http");
-
+require('dotenv').config();
 // making express app
 const app = express();
 connectDB();

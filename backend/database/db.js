@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 // function (Any)
 const connectDB = async () => {
-    mongoose.connect('mongodb://0.0.0.0:27017/web').then(() =>{
+    mongoose.connect('mongodb://root:example@localhost:27017').then(() =>{
     console.log("Connected to Database")
 })
 }

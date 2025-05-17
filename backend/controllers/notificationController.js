@@ -1,54 +1,76 @@
+const mongoose = require("mongoose"); // Make sure mongoose is imported
 const Users = require("../model/userModel");
 const Notifications = require("../model/notificationModel");
 const Futsals = require("../model/futsalModel");
 const Bookings = require("../model/bookingModel");
 
 const createNotification = async (req, res) => {
-  console.log(req.body);
   const { userId, title, description } = req.body;
+
+  console.log("Received data:", userId);
+
+  // Validate userId
+  if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or missing userId",
+    });
+  }
+
+  const objectId = new mongoose.Types.ObjectId(userId);
 
   try {
     const newNotification = new Notifications({
-      user: userId,
-      description: description,
-      title: title,
+      user: objectId,
+      description,
+      title,
     });
 
-    console.log(newNotification);
-    let savedNotification = await newNotification.save();
+    console.log("New notification to save:", newNotification);
+
+    const savedNotification = await newNotification.save();
 
     const socketInfo = req.app.locals.socketInfo;
 
-    // socketInfo.io.emit(" addadmin notification", savedNotification);
+    // Find futsal managed by the admin user (using ObjectId for user)
+    const findAdminFutsal = await Futsals.findOne({ user: objectId });
+    if (!findAdminFutsal) {
+      return res.status(404).json({
+        success: false,
+        message: "Futsal not found for the given user",
+      });
+    }
 
-    let findAdminFustal = await Futsals.findOne({ user: userId });
-
-    let futsalCustomers = await Bookings.distinct("user", {
-      futsal: findAdminFustal._id,
+    // Get unique customers who booked that futsal
+    const futsalCustomers = await Bookings.distinct("user", {
+      futsal: findAdminFutsal._id,
     });
 
-    futsalCustomers.forEach((userId) => {
-      const targetSocketIds = socketInfo.users[userId] || [];
-      targetSocketIds.forEach((targetSocketId) => {
-        socketInfo.io
-          .to(targetSocketId)
-          .emit("admin add notification", savedNotification);
+    // Notify all futsal customers via their socket connections
+    futsalCustomers.forEach((customerUserId) => {
+      const targetSocketIds = socketInfo.users[customerUserId] || [];
+      targetSocketIds.forEach((socketId) => {
+        socketInfo.io.to(socketId).emit("admin add notification", savedNotification);
       });
     });
 
     return res.status(201).json({
       success: true,
       message: "Notification created successfully",
-      notification: newNotification,
+      notification: savedNotification,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error creating notification:", error);
+    return res.status(500).json({
       success: false,
       message: "Server Error",
       error: error.message,
     });
   }
 };
+
+module.exports = { createNotification };
+
 
 const getSingleNotification = async (req, res) => {
   const id = req.params.id;
@@ -174,10 +196,10 @@ const usernotification = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      data : {
+      data: {
         notifications: notifications,
         adminFutsals: adminFutsals,
-      }
+      },
     });
   } catch (error) {
     console.error(error);

@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
+
 const createAdmin = async (req, res) => {
   try {
     
@@ -275,4 +276,5 @@ module.exports = {
   updateUser,
   getSingleUser,
   forgetPassword,
+  createAdmin
 };

@@ -1,24 +1,35 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useEffect, useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/login");
+  };
   const images = [
     "/../assets/images/football/3.jpg",
     "/../assets/images/football/4.jpg",
     "/../assets/images/football/5.jpg",
-  ]
+  ];
 
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length)
-    }, 3000)
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 3000);
 
-    return () => clearInterval(interval)
-  }, [images.length])
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   const faqItems = [
     {
@@ -46,7 +57,7 @@ const Landing = () => {
       answer:
         "Basic equipment such as balls and bibs are provided. However, players are encouraged to bring their own footwear and personal gear for comfort and hygiene purposes.",
     },
-  ]
+  ];
 
   return (
     <>
@@ -68,9 +79,16 @@ const Landing = () => {
           ))}
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
             <div className="text-center text-white px-4">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">Futsal Nepal</h1>
-              <p className="text-xl md:text-2xl mb-8">Book your futsal court with ease</p>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                Futsal Nepal
+              </h1>
+              <p className="text-xl md:text-2xl mb-8">
+                Book your futsal court with ease
+              </p>
+              <button
+                onClick={handleClick}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+              >
                 Book Now
               </button>
             </div>
@@ -82,7 +100,9 @@ const Landing = () => {
         <div className="py-16 bg-gray-50">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-800">HOW IT WORKS</h1>
-            <p className="text-gray-700 font-medium text-xl mt-4">SIMPLE STEPS TO ELEVATE YOUR FUTSAL EXPERIENCE</p>
+            <p className="text-gray-700 font-medium text-xl mt-4">
+              SIMPLE STEPS TO ELEVATE YOUR FUTSAL EXPERIENCE
+            </p>
           </div>
           <div className="mt-12 container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -93,8 +113,12 @@ const Landing = () => {
                   src="/../assets/images/create account.png"
                   alt="Create Account"
                 />
-                <h3 className="font-semibold text-xl text-gray-800 mt-5">Create Your Account</h3>
-                <p className="text-gray-600 mt-2">Sign up and set up your futsal league profile in minutes.</p>
+                <h3 className="font-semibold text-xl text-gray-800 mt-5">
+                  Create Your Account
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Sign up and set up your futsal league profile in minutes.
+                </p>
               </div>
               {/* Step 2 */}
               <div className="bg-white rounded-lg shadow-lg p-6 transition-transform hover:scale-105">
@@ -103,8 +127,12 @@ const Landing = () => {
                   src="/../assets/images/team.jpg"
                   alt="Organize Matches"
                 />
-                <h3 className="font-semibold text-xl text-gray-800 mt-5">Organize Matches</h3>
-                <p className="text-gray-600 mt-2">Schedule and manage your matches with a few clicks.</p>
+                <h3 className="font-semibold text-xl text-gray-800 mt-5">
+                  Organize Matches
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Schedule and manage your matches with a few clicks.
+                </p>
               </div>
               {/* Step 3 */}
               <div className="bg-white rounded-lg shadow-lg p-6 transition-transform hover:scale-105">
@@ -113,8 +141,12 @@ const Landing = () => {
                   src="/../assets/images/match.jpeg"
                   alt="Enjoy Futsal"
                 />
-                <h3 className="font-semibold text-xl text-gray-800 mt-5">Enjoy Futsal</h3>
-                <p className="text-gray-600 mt-2">Play and track your games with ease and fun.</p>
+                <h3 className="font-semibold text-xl text-gray-800 mt-5">
+                  Enjoy Futsal
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Play and track your games with ease and fun.
+                </p>
               </div>
             </div>
           </div>
@@ -124,15 +156,23 @@ const Landing = () => {
         {/* FAQ Section */}
         <div className="py-16 bg-white">
           <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-gray-800">FREQUENTLY ASKED QUESTIONS</h1>
-            <p className="text-gray-700 font-medium text-xl mt-4">EVERYTHING YOU NEED TO KNOW</p>
+            <h1 className="text-3xl font-bold text-gray-800">
+              FREQUENTLY ASKED QUESTIONS
+            </h1>
+            <p className="text-gray-700 font-medium text-xl mt-4">
+              EVERYTHING YOU NEED TO KNOW
+            </p>
           </div>
           <div className="container mx-auto px-4 max-w-3xl">
             <Accordion type="single" collapsible className="w-full">
               {faqItems.map((item, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left font-semibold text-lg py-4">{item.question}</AccordionTrigger>
-                  <AccordionContent className="text-gray-600">{item.answer}</AccordionContent>
+                  <AccordionTrigger className="text-left font-semibold text-lg py-4">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-gray-600">
+                    {item.answer}
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -144,7 +184,9 @@ const Landing = () => {
         <div className="py-16 bg-gray-50">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-800">CONTACT US</h1>
-            <p className="text-gray-700 font-medium text-xl mt-4">WE WOULD LOVE TO HEAR FROM YOU</p>
+            <p className="text-gray-700 font-medium text-xl mt-4">
+              WE WOULD LOVE TO HEAR FROM YOU
+            </p>
           </div>
           <div className="mt-12 container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -155,8 +197,12 @@ const Landing = () => {
                   src="/../assets/images/contact.jpg"
                   alt="Contact Us"
                 />
-                <h3 className="font-semibold text-xl text-gray-800 mt-5">Reach Out to Us</h3>
-                <p className="text-gray-600 mt-2">Send us an email or call for inquiries.</p>
+                <h3 className="font-semibold text-xl text-gray-800 mt-5">
+                  Reach Out to Us
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Send us an email or call for inquiries.
+                </p>
               </div>
               {/* Section 2 */}
               <div className="bg-white rounded-lg shadow-lg p-6 transition-transform hover:scale-105">
@@ -165,8 +211,12 @@ const Landing = () => {
                   src="/../assets/images/phone.jpg"
                   alt="Phone"
                 />
-                <h3 className="font-semibold text-xl text-gray-800 mt-5">Call Us</h3>
-                <p className="text-gray-600 mt-2">Get in touch via phone for immediate assistance.</p>
+                <h3 className="font-semibold text-xl text-gray-800 mt-5">
+                  Call Us
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  Get in touch via phone for immediate assistance.
+                </p>
               </div>
               {/* Section 3 */}
               <div className="bg-white rounded-lg shadow-lg p-6 transition-transform hover:scale-105">
@@ -175,8 +225,12 @@ const Landing = () => {
                   src="/../assets/images/email.jpg"
                   alt="Email"
                 />
-                <h3 className="font-semibold text-xl text-gray-800 mt-5">Email Us</h3>
-                <p className="text-gray-600 mt-2">We are always available through email.</p>
+                <h3 className="font-semibold text-xl text-gray-800 mt-5">
+                  Email Us
+                </h3>
+                <p className="text-gray-600 mt-2">
+                  We are always available through email.
+                </p>
               </div>
             </div>
           </div>
@@ -245,16 +299,28 @@ const Landing = () => {
           <div className="flex flex-col items-center md:items-start">
             <span className="text-xl font-medium mb-4">Follow Us</span>
             <div className="flex space-x-4">
-              <a href="#" className="text-neutral-700 hover:text-green-600 transition-colors">
+              <a
+                href="#"
+                className="text-neutral-700 hover:text-green-600 transition-colors"
+              >
                 <i className="fa-brands fa-twitter fa-lg"></i>
               </a>
-              <a href="#" className="text-neutral-700 hover:text-green-600 transition-colors">
+              <a
+                href="#"
+                className="text-neutral-700 hover:text-green-600 transition-colors"
+              >
                 <i className="fa-brands fa-facebook fa-lg"></i>
               </a>
-              <a href="#" className="text-neutral-700 hover:text-green-600 transition-colors">
+              <a
+                href="#"
+                className="text-neutral-700 hover:text-green-600 transition-colors"
+              >
                 <i className="fa-brands fa-instagram fa-lg"></i>
               </a>
-              <a href="#" className="text-neutral-700 hover:text-green-600 transition-colors">
+              <a
+                href="#"
+                className="text-neutral-700 hover:text-green-600 transition-colors"
+              >
                 <i className="fa-brands fa-pinterest fa-lg"></i>
               </a>
             </div>
@@ -263,7 +329,9 @@ const Landing = () => {
 
         <div className="w-11/12 lg:w-5/6 mx-auto border-t border-neutral-300 mt-8 pt-8">
           <div className="text-neutral-700 flex flex-col md:flex-row justify-between items-center">
-            <span className="mb-4 md:mb-0">© {new Date().getFullYear()} Futsal Nepal. All Rights Reserved</span>
+            <span className="mb-4 md:mb-0">
+              © {new Date().getFullYear()} Futsal Nepal. All Rights Reserved
+            </span>
             <div className="flex space-x-4">
               <a href="#" className="hover:text-green-600 transition-colors">
                 Privacy Policy
@@ -276,7 +344,7 @@ const Landing = () => {
         </div>
       </footer>
     </>
-  )
-}
+  );
+};
 
-export default Landing
+export default Landing;

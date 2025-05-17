@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -13,6 +11,7 @@ import { loginUserApi } from "@/api/api";
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [responseMessage, setResponseMessage] = useState<string>("");
 
   const formik = useFormik({
     initialValues: {
@@ -23,18 +22,21 @@ const Login = () => {
       userName: Yup.string().required("Username is required"),
       password: Yup.string().required("Password is required"),
     }),
-    onSubmit: (values:any) => {
+    onSubmit: (values: any) => {
       loginUserApi(values)
         .then((res: any) => {
-          if (res.data.success === false) {
-            toast.error(res.data.message);
-          } else {
-            toast(res.data.message);
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("user", JSON.stringify(res.data.userData));
+          const { success, message, token, userData } = res.data;
 
-            const user = res.data.userData;
-            if (user.isAdmin) {
+          setResponseMessage(message);  // Show response message inline
+
+          if (!success) {
+            toast.error(message);
+          } else {
+            toast(message);
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(userData));
+
+            if (userData.isAdmin) {
               navigate("/admin/futsal");
               window.location.reload();
             } else {
@@ -44,15 +46,13 @@ const Login = () => {
           }
         })
         .catch((err: any) => {
-          toast("Server Error");
-          console.log(err.message);
+          const errorMsg = "Server Error";
+          setResponseMessage(errorMsg); // Show error inline
+          toast(errorMsg);
+          console.error(err.message);
         });
     },
   });
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
   return (
     <div className="min-h-screen flex items-center bg-gray-100">
@@ -138,6 +138,13 @@ const Login = () => {
                 <p className="text-red-500 text-sm">{formik.errors.password}</p>
               )}
             </div>
+
+            {/* Display server response message */}
+            {responseMessage && (
+              <p className="text-center text-red-600 font-semibold">
+                {responseMessage}
+              </p>
+            )}
 
             <Button
               type="submit"

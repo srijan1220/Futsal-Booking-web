@@ -27,6 +27,7 @@ const AddNotification = () => {
   const storedUser = localStorage.getItem("user");
   const user: User | null = storedUser ? JSON.parse(storedUser) : null;
   const id = user?._id ?? null;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -47,8 +48,18 @@ const AddNotification = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const storedUser = localStorage.getItem("user");
+    const user: User | null = storedUser ? JSON.parse(storedUser) : null;
+    const id = user?._id ?? "";
+
+    if (!id) {
+      toast.error("User not found or not logged in");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("userId", "userid");
+    formData.append("userId", id);
     formData.append("title", title);
     formData.append("description", description);
 

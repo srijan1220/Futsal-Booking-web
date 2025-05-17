@@ -3,36 +3,52 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { useEffect, useState } from "react"
+} from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 type Stats = {
-  total: number
-  pending: number
-  approved: number
-  rejected: number
-}
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+};
+
+const defaultStats: Stats = {
+  total: 0,
+  pending: 0,
+  approved: 0,
+  rejected: 0,
+};
 
 export function SectionCards() {
-  const [stats, setStats] = useState<Stats>({
-    total: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-  });
-
+  const [stats, setStats] = useState<Stats>(defaultStats);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch("http://localhost:5000/api/dashboard/getBookingStatus");
+        const response = await fetch(
+          "http://localhost:5000/api/dashboard/getBookingStatus"
+        );
         const data = await response.json();
-        if (data.success) {
-          setStats(data.stats);
+
+        if (data.success && typeof data.stats === "object") {
+          // Use fallback of 0 for any missing fields
+          const {
+            total = 0,
+            pending = 0,
+            approved = 0,
+            rejected = 0,
+          } = data.stats || {};
+
+          setStats({ total, pending, approved, rejected });
+        } else {
+          // fallback if success is false or stats is missing
+          setStats(defaultStats);
         }
       } catch (error) {
         console.error("Failed to fetch booking stats", error);
+        setStats(defaultStats);
       } finally {
         setLoading(false);
       }
@@ -76,5 +92,5 @@ export function SectionCards() {
         </CardHeader>
       </Card>
     </div>
-  )
+  );
 }

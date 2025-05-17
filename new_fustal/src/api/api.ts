@@ -67,7 +67,7 @@ export const getSingleBookingApi = (id: string) =>
 // Notification APIs
 export const createNotitificationAPI = (data: any) =>
   Api.post("/api/notification/createnotification", data, config);
-export const getNotitificationAPI = (id: string) =>
+export const getNotitificationAPI = (id:any) =>
   Api.get(`/api/notification/get_notification/${id}`);
 export const updateNotitificationAPI = (id: string, formData: any) =>
   Api.put(`/api/notification/update_notification/${id}`, formData, config);
