@@ -4,19 +4,34 @@ import Select from 'react-select';
 import { toast } from 'react-toastify';
 import { getSingleBookingApi, updateBookingApi } from '../api/api';
 
+interface Booking {
+  _id: string;
+  futsal: {
+    futsalName: string;
+    futsalPrice: number;
+  };
+  date: string;
+  from: string | string[];
+}
+
+interface TimeOption {
+  value: string;
+  label: string;
+}
+
 const EditMybookings = () => {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const [minDate, setMinDate] = useState('');
-    const [futsalName, setFutsalName] = useState('');
-    const [futsalPrice, setFutsalPrice] = useState('');
-    const [futsalDate, setFutsalDate] = useState('');
-    const [selectedTimes, setSelectedTimes] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isBookingTimePassed, setIsBookingTimePassed] = useState(false);
+    const [minDate, setMinDate] = useState<string>('');
+    const [futsalName, setFutsalName] = useState<string>('');
+    const [futsalPrice, setFutsalPrice] = useState<string>('');
+    const [futsalDate, setFutsalDate] = useState<string>('');
+    const [selectedTimes, setSelectedTimes] = useState<TimeOption[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isBookingTimePassed, setIsBookingTimePassed] = useState<boolean>(false);
 
-    const timeOptions = [
+    const timeOptions: TimeOption[] = [
         { value: '6:00-7:00', label: '6:00-7:00' },
         { value: '7:00-8:00', label: '7:00-8:00' },
         { value: '8:00-9:00', label: '8:00-9:00' },
@@ -37,22 +52,25 @@ const EditMybookings = () => {
         const today = new Date();
         const formattedToday = today.toISOString().split('T')[0];
         setMinDate(formattedToday);
-        if(id!=null){
-        getSingleBookingApi(id).then((res) => {
-            setFutsalName(res.data.booking.futsal.futsalName);
-            setFutsalPrice(res.data.booking.futsal.futsalPrice);
-            setFutsalDate(res.data.booking.date);
+        
+        if (id) {
+            getSingleBookingApi(id).then((res) => {
+                const booking: Booking = res.data.booking;
+                setFutsalName(booking.futsal.futsalName);
+                setFutsalPrice(booking.futsal.futsalPrice.toString());
+                setFutsalDate(booking.date);
 
-            const fromData = res.data.booking.from;
-            if (Array.isArray(fromData)) {
-                setSelectedTimes(fromData.map(time => ({ value: time, label: time })));
-            } else {
-                setSelectedTimes([{ value: fromData, label: fromData }]);
-            }
-        });
-
+                const fromData = booking.from;
+                if (Array.isArray(fromData)) {
+                    setSelectedTimes(fromData.map(time => ({ value: time, label: time })));
+                } else {
+                    setSelectedTimes([{ value: fromData, label: fromData }]);
+                }
+            }).catch(error => {
+                toast.error("Error fetching booking details");
+                console.error(error);
+            });
         }
-
     }, [id]);
 
     useEffect(() => {
@@ -61,40 +79,59 @@ const EditMybookings = () => {
             const bookingDateTime = new Date(futsalDate); 
             setIsBookingTimePassed(currentTime > bookingDateTime);
         }
-    }, [futsalDate]); 
-    const handleTimeChange = (selectedOptions) => {
-        setSelectedTimes(selectedOptions);
+    }, [futsalDate]);
+
+    const handleTimeChange = (selectedOptions: readonly TimeOption[]) => {
+        setSelectedTimes([...selectedOptions]);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (isBookingTimePassed) {
+            toast.error("Cannot edit past bookings");
+            return;
+        }
+        
+        if (selectedTimes.length === 0) {
+            toast.error("Please select at least one time slot");
+            return;
+        }
+        
         setIsModalOpen(true);
     };
 
     const confirmChanges = () => {
         setIsModalOpen(false);
 
+        if (!id) {
+            toast.error("Invalid booking ID");
+            return;
+        }
+
         const formData = new FormData();
         formData.append('date', futsalDate);
         const times = selectedTimes.map(option => option.value);
         formData.append('from', JSON.stringify(times));
 
-        // Making the API call
-        updateBookingApi(id, formData).then((res) => {
-            if (res.data.success === true) {
-                toast.success(res.data.message);
-                navigate('/mybooking/');
-            } else {
-                toast.error(res.data.message);
-            }
-        }).catch(err => {
-            toast.error("Server Error");
-        });
+        updateBookingApi(id, formData)
+            .then((res) => {
+                if (res.data.success === true) {
+                    toast.success(res.data.message);
+                    navigate('/mybooking');
+                } else {
+                    toast.error(res.data.message);
+                }
+            })
+            .catch(err => {
+                toast.error("Server Error");
+                console.error(err);
+            });
     };
 
     return (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" id="my-modal">
-            <div className="relative top-20 mx-auto p-5 border w-1/2 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" id="my-modal">
+            <div className="relative top-20 mx-auto p-5 border w-full md:w-1/2 shadow-lg rounded-md bg-white">
                 {/* Close button */}
                 <div className="absolute top-0 right-0 pt-4 pr-4">
                     <Link to={'/mybooking'} className="bg-[#e92939] py-2 px-3 text-white rounded m-1 text-sm">
@@ -103,8 +140,10 @@ const EditMybookings = () => {
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
-                    <h3 className="text-lg font-medium leading-6 text-gray-900 text-center font-semibold text-2xl">Edit Booking Changes</h3>
-                    {/* ... Existing Form Fields ... */}
+                    <h3 className="text-lg font-medium leading-6 text-gray-900 text-center font-semibold text-2xl">
+                        Edit Booking Changes
+                    </h3>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label htmlFor="futsalName" className="block text-sm font-medium text-gray-900">
@@ -113,12 +152,9 @@ const EditMybookings = () => {
                             <input
                                 type="text"
                                 id="futsalName"
-
                                 readOnly
                                 className="mt-1 block w-full border border-solid border-gray-300 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
                                 value={futsalName}
-                                onChange={(e) => setFutsalName(futsalName)}
-
                             />
                         </div>
                         <div>
@@ -131,10 +167,10 @@ const EditMybookings = () => {
                                 readOnly
                                 className="mt-1 block w-full border border-solid border-gray-300 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
                                 value={futsalPrice}
-                                onChange={(e) => setFutsalPrice(futsalPrice)}
                             />
                         </div>
                     </div>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label htmlFor="date" className="block text-sm font-medium text-gray-900">
@@ -148,11 +184,8 @@ const EditMybookings = () => {
                                 value={futsalDate}
                                 onChange={(e) => setFutsalDate(e.target.value)}
                                 min={minDate}
-
                             />
                         </div>
-                       
-                       
                     </div>
                    
                     <div>
@@ -167,13 +200,19 @@ const EditMybookings = () => {
                             classNamePrefix="select"
                             onChange={handleTimeChange}
                             value={selectedTimes}
+                            isDisabled={isBookingTimePassed}
                         />
+                        {isBookingTimePassed && (
+                            <p className="text-red-500 text-sm mt-1">
+                                Cannot edit times for past bookings
+                            </p>
+                        )}
                     </div>
 
-                    {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                        className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400"
+                        disabled={isBookingTimePassed}
                     >
                         Save Changes
                     </button>
@@ -182,14 +221,24 @@ const EditMybookings = () => {
 
             {/* Confirmation Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
-                    <div className="bg-white p-5 rounded-lg shadow-xl">
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50">
+                    <div className="bg-white p-5 rounded-lg shadow-xl max-w-md w-full">
                         <h2 className="text-xl font-bold mb-4">Confirm Changes</h2>
                         <p><strong>Date:</strong> {futsalDate}</p>
                         <p><strong>Time:</strong> {selectedTimes.map(option => option.label).join(", ")}</p>
                         <div className="mt-4 flex justify-end space-x-3">
-                            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" onClick={confirmChanges}>Confirm</button>
-                            <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                            <button 
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                onClick={confirmChanges}
+                            >
+                                Confirm
+                            </button>
+                            <button 
+                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>

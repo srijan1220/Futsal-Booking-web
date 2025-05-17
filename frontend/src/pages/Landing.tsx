@@ -22,14 +22,15 @@ const Landing = () => {
         return () => clearInterval(interval);
     }, [currentIndex, images.length]);
 
-    const containerStyle = {
-        width: '100%',
-        marginLeft: '4px',
-        marginRight: '4px',
-        height: '500px',
-        position: 'relative',
-        overflow: 'hidden',
-    };
+    const containerStyle: React.CSSProperties = {
+  width: '100%',
+  marginLeft: '4px',
+  marginRight: '4px',
+  height: '500px',
+  position: 'relative', // ✅ Now TypeScript knows this is a valid value
+  overflow: 'hidden',
+};
+
 
 
     return (

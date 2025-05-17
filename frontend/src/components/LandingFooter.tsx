@@ -32,7 +32,7 @@ const LandingFooter = ()=>{
                 <i className="fa-solid fa-phone mt-2 text-neutral-700 mr-2"></i>
                 980000000000</span>
             <span className="mt-3 font-medium">
-                <i class="fa-regular fa-message mt-2 text-neutral-700 mr-2"></i>FutsalNepal@gmail.com</span>
+                <i className="fa-regular fa-message mt-2 text-neutral-700 mr-2"></i>FutsalNepal@gmail.com</span>
         </div>
     </div>
 

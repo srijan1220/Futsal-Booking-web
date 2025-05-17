@@ -126,7 +126,7 @@ const AdminEditFutsal = () => {
                 </div>
                 <div>
                   <label htmlFor="futsalDescription" className="block text-sm font-medium text-gray-900">Futsal Description</label>
-                  <textarea id="futsalDescription" value={futsalDescription} onChange={(e) => setFutsalDescription(e.target.value)} className="mt-1 block w-full border border-solid border-gray-300 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5" rows="4" required></textarea>
+                  <textarea id="futsalDescription" value={futsalDescription} onChange={(e) => setFutsalDescription(e.target.value)} className="mt-1 block w-full border border-solid border-gray-300 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5" rows={4} required></textarea>
                 </div>
                 <div>
                   <label htmlFor="latitude" className="block text-sm font-medium text-gray-900">Futsal Latitude</label>

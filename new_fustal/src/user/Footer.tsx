@@ -51,7 +51,7 @@ const Footer = ()=>{
 
 <div className="text-neutral-700 flex flex-col md:flex-row justify-between mt-4 w-5/6 mx-auto">
     <span className='mb-4 md:mb-0 md:mr-4 max-w-[400px]'>© Copyright, Property All Rights Reserved</span>
-    <span className='max-w-[400px]'>© Designed and Developed by Aashutosh Aryal</span>
+    <span className='max-w-[400px]'>© Designed and Developed by Srijan Shrestha</span>
 </div>
 
 </footer>

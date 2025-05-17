@@ -6,9 +6,16 @@ import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 
 const AllNotifications = () => {
-  const user = JSON.parse(localStorage.getItem('user'))
+  type Notification = {//added this type
+  _id: string;
+  title: string;
+  description: string;
+};
+const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const user = JSON.parse(localStorage.getItem('user')||"null")
   const userId = user ? user._id : null;
-  const [notifications, setNotifications] = useState([]);
+  //const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     // Fetch all notifications when the component mounts

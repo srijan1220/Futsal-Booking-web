@@ -43,8 +43,7 @@ const AdminBookings = () => {
             .then((res) => {
                 if (res.data.success) {
                     setBookings(bookings.map(booking =>
-                        booking._id === bookingId ? { ...booking, approvalStatus: 'rejected' } : booking
-                    ));
+                        booking._id === bookingId ? { ...booking, approvalStatus: 'rejected' } : booking));
                     toast({ title: "Booking Rejected" });
                 } else {
                     console.error('Error rejecting booking:', res.data.message);

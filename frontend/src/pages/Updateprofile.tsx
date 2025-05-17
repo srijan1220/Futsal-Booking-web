@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 // import Footer from '../components/footer';
 
 const UserProfile = () => {
-    const user = JSON.parse(localStorage.getItem('user'))
+    const user = JSON.parse(localStorage.getItem('user')||"null")
     const { id } = useParams();
     const navigate = useNavigate();
    

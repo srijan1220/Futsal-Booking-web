@@ -76,7 +76,7 @@ const EditNotification = () => {
               <textarea
                 id="description"
                 className="mt-1 block w-full border border-solid border-gray-300 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                rows="4"
+                rows={4}
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

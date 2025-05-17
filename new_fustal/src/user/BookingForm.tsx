@@ -9,23 +9,56 @@ import { createBookingApi, createReviewApi, getAvailableTimeSlotsApi, getAvgRati
 import Footer from '../components/Footer';
 import Navbar from '@/components/Navbar';
 
+interface Futsal {
+  _id: string;
+  futsalName: string;
+  futsalLocation: string;
+  futsalPrice: number;
+  futsalDescription: string;
+  futsalContact: string;
+  futsalImageUrl: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface Review {
+  _id: string;
+  user: {
+    userName: string;
+    _id: string;
+  };
+  rating: number;
+  review: string;
+  date: string;
+}
+
+interface TimeOption {
+  value: string;
+  label: string;
+}
+
+interface User {
+  _id: string;
+  userName: string;
+  // Add other user properties as needed
+}
+
 const BookingForm = () => {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const [futsal, setFutsal] = useState([]);
-    const [date, setDate] = useState('');
-    const [selectedTimes, setSelectedTimes] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [minDate, setMinDate] = useState('');
-    const [futsalName, setFutsalName] = useState('');
-    const [validOptions, setValidOptions] = useState([]);
-    const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+    const [futsal, setFutsal] = useState<Futsal | null>(null);
+    const [date, setDate] = useState<string>('');
+    const [selectedTimes, setSelectedTimes] = useState<TimeOption[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [minDate, setMinDate] = useState<string>('');
+    const [futsalName, setFutsalName] = useState<string>('');
+    const [validOptions, setValidOptions] = useState<TimeOption[]>([]);
+    const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
+    
+    const storedUser: User = JSON.parse(localStorage.getItem('user') || '{}');
 
-    //const storedUser = JSON.parse(localStorage.getItem('user'));
-    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-
-    let availableTime = [
+    const availableTime = [
         '6:00-7:00',
         '7:00-8:00',
         '8:00-9:00',
@@ -40,23 +73,18 @@ const BookingForm = () => {
         '17:00-18:00',
         '18:00-19:00',
         '19:00-20:00',
-    ]
+    ];
 
-    //var timeOptions = [];
-    let timeOptions: { value: string; label: string }[] = [];
+    const [rating, setRating] = useState<number>(0);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
+    const [reviewText, setReviewText] = useState<string>('');
 
-
-    const [rating, setRating] = useState(0);
-    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    const [reviewText, setReviewText] = useState('');
-
-
-    //const handleStarClick = (selectedRating) =>
-    const handleRatingChange = (selectedRating: number) =>  {
+    const handleRatingChange = (selectedRating: number) => {
         setRating(selectedRating);
     };
 
-    const [reviews, setReviews] = useState([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [avgRating, setAvgRating] = useState<number | null>(null);
 
     const defaultIcon = L.icon({
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/svgs/solid/map-marker.svg',
@@ -66,13 +94,12 @@ const BookingForm = () => {
     });
 
     useEffect(() => {
-        // Fetch reviews when the component mounts
         if (id) {
-            // Replace 'id' with the actual futsal ID
             getReviewsByFutsalIdApi(id)
                 .then((res) => {
-                    // Sort reviews by date in descending order
-                    const sortedReviews = res.data.reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    const sortedReviews = res.data.reviews.sort((a: Review, b: Review) => 
+                        new Date(b.date).getTime() - new Date(a.date).getTime()
+                    );
                     setReviews(sortedReviews);
                 })
                 .catch((error) => {
@@ -81,10 +108,7 @@ const BookingForm = () => {
         }
     }, [id]);
 
-    const [avgRating, setAvgRating] = useState(null); // New state to store average rating
-
     useEffect(() => {
-        // Fetch average rating when the component mounts
         if (id) {
             getAvgRatingApi(id)
                 .then((res) => {
@@ -113,43 +137,42 @@ const BookingForm = () => {
         }
     }, [id]);
 
-
-    useEffect(() => {
-        if (futsal) {
-            console.log("futsal", futsal)
-        }
-
-    }, [futsal]
-    )
     useEffect(() => {
         if (id && date) {
             getAvailableTimeSlotsApi(id, date)
                 .then((data) => {
-                    availableTime = availableTime.filter(item => !data.data['bookedTimeSlots'].includes(item))
-                    for (var i = 0; i < availableTime.length; i++) {
-                        timeOptions.push({ value: availableTime[i], label: availableTime[i] })
-                    }
-                    setValidOptions(timeOptions)
-                    setAvailableTimeSlots(data.data['bookedTimeSlots']);
+                    const filteredTimes = availableTime.filter(item => 
+                        !data.data.bookedTimeSlots.includes(item)
+                    );
+                    const timeOptions = filteredTimes.map(time => ({
+                        value: time,
+                        label: time
+                    }));
+                    setValidOptions(timeOptions);
+                    setAvailableTimeSlots(data.data.bookedTimeSlots);
                 })
                 .catch((error) => {
                     console.error('Error Fetching Available Time Slots', error);
-                    console.log(error)
                 });
         }
     }, [id, date]);
 
-    const handleTimeChange = (selectedOptions) => {
-        setSelectedTimes(selectedOptions);
+    const handleTimeChange = (selectedOptions: readonly TimeOption[]) => {
+        setSelectedTimes([...selectedOptions]);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsModalOpen(true);
     };
 
     const confirmBooking = () => {
         setIsModalOpen(false);
+
+        if (!id || !storedUser?._id) {
+            toast.error('Invalid user or futsal ID');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('user', storedUser._id);
@@ -174,9 +197,13 @@ const BookingForm = () => {
             });
     };
 
-
     const handleReviewSubmit = () => {
         setIsReviewModalOpen(false);
+
+        if (!id || !storedUser?._id) {
+            toast.error('Invalid user or futsal ID');
+            return;
+        }
 
         const reviewData = {
             user: storedUser._id,
@@ -185,14 +212,25 @@ const BookingForm = () => {
             review: reviewText
         };
 
-        // Add logic to create review
         createReviewApi(reviewData)
             .then((res) => {
                 if (res.data.success === false) {
                     toast.error(res.data.message);
                 } else {
                     toast.success(res.data.message);
-                    // You can navigate or perform other actions after submitting the review
+                    // Refresh reviews after submission
+                    getReviewsByFutsalIdApi(id)
+                        .then((res) => {
+                            const sortedReviews = res.data.reviews.sort((a: Review, b: Review) => 
+                                new Date(b.date).getTime() - new Date(a.date).getTime()
+                            );
+                            setReviews(sortedReviews);
+                        });
+                    // Refresh average rating
+                    getAvgRatingApi(id)
+                        .then((res) => {
+                            setAvgRating(res.data.averageRating);
+                        });
                 }
             })
             .catch((err) => {
@@ -207,12 +245,12 @@ const BookingForm = () => {
             <div className="flex flex-col mt-2">
                 <div className='w-full flex flex-wrap justify-center items-center'>
                     <div className='ml-2'>
-                        <p className='text-\white font-semibold text-3xl px-3 py-3 bg-green-500 rounded-lg'>
+                        <p className='text-white font-semibold text-3xl px-3 py-3 bg-green-500 rounded-lg'>
                             {avgRating !== null ? avgRating.toFixed(1) : 'Loading...'}
                         </p>
                     </div>
                     <div className="w-4/5 justify-center mx-auto h-[400px]">
-                        <img src={futsal.futsalImageUrl} alt="Futsal banner" className="w-full h-full object-cover rounded-md" />
+                        <img src={futsal?.futsalImageUrl} alt="Futsal banner" className="w-full h-full object-cover rounded-md" />
                     </div>
                 </div>
                 <div className="flex flex-1 flex-col md:flex-row items-start justify-center p-4 md:mt-4 mt-24">
@@ -221,23 +259,20 @@ const BookingForm = () => {
                             <h1 className="text-3xl font-bold text-center md:text-left">{futsalName}</h1>
                         </div>
                         <div className="flex-grow">
-                            <h2 className="text-2xl font-bold mb-3">Location: {futsal.futsalLocation}</h2>
-                            <p className="text-lg font-semibold mb-4">Price: Rs{futsal.futsalPrice}/hr</p>
+                            <h2 className="text-2xl font-bold mb-3">Location: {futsal?.futsalLocation}</h2>
+                            <p className="text-lg font-semibold mb-4">Price: Rs{futsal?.futsalPrice}/hr</p>
                         </div>
                         <div className="flex-grow">
                             <h3 className="font-bold mb-2">Our Services:</h3>
                             <ul className="list-disc ml-4 mb-4">
-                                <li>{futsal.futsalDescription}</li>
-
+                                <li>{futsal?.futsalDescription}</li>
                             </ul>
                         </div>
-                        {/* Futsal Contact */}
                         <div className="flex-grow">
-                            <p className="font-semibold">Contact no: {futsal.futsalContact}</p>
+                            <p className="font-semibold">Contact no: {futsal?.futsalContact}</p>
                         </div>
                     </div>
 
-                    {/* Booking Form */}
                     <div className="md:w-1/3 w-full bg-white p-8 m-2 rounded-lg shadow-lg transform md:translate-y-0 -translate-y-1/4 flex flex-col items-center justify-center border-2 border-solid border-black">
                         <form className="flex flex-col space-y-4 w-4/5" onSubmit={handleSubmit}>
                             <input
@@ -245,20 +280,23 @@ const BookingForm = () => {
                                 id="name"
                                 type="text"
                                 placeholder="Name"
+                                value={storedUser?.userName || ''}
+                                readOnly
                             />
                             <input
                                 className="shadow appearance-none border border-solid border-black rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 id="phone"
                                 type="text"
                                 placeholder="Phone Number"
+                                required
                             />
                             <input
                                 className="shadow appearance-none border border-solid border-black rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 id="date"
                                 type="date"
                                 onChange={(e) => setDate(e.target.value)}
-
                                 min={minDate}
+                                required
                             />
                             <Select
                                 isMulti
@@ -268,9 +306,9 @@ const BookingForm = () => {
                                 classNamePrefix="Time"
                                 onChange={handleTimeChange}
                                 value={selectedTimes}
+                                required
                             />
 
-                            {/* Submit Button */}
                             <button
                                 className="bg-green-500 hover:bg-green-700 w-full text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline"
                                 type="submit"
@@ -279,59 +317,57 @@ const BookingForm = () => {
                             </button>
                         </form>
                     </div>
-                    <div className="md:w-1/3 w-full bg-white  h-[418px] p-8 m-2 rounded-lg border-2 border-solid border-black shadow-lg transform md:translate-y-0 -translate-y-1/4">
-                        <h2 className="text-2xl font-bold mb-4">Booked Time Slots for: {date}</h2>
+                    <div className="md:w-1/3 w-full bg-white h-[418px] p-8 m-2 rounded-lg border-2 border-solid border-black shadow-lg transform md:translate-y-0 -translate-y-1/4">
+                        <h2 className="text-2xl font-bold mb-4">Booked Time Slots for: {date || 'Select a date'}</h2>
                         <ul className="list-disc ml-4">
-
-                            {availableTimeSlots.map((timeSlot, index) => (
-                                <li key={index}>{timeSlot}</li>
-                            ))}
+                            {availableTimeSlots.length > 0 ? (
+                                availableTimeSlots.map((timeSlot, index) => (
+                                    <li key={index}>{timeSlot}</li>
+                                ))
+                            ) : (
+                                <li>No bookings for selected date</li>
+                            )}
                         </ul>
                     </div>
                 </div>
                 <div className="flex flex-wrap">
-
-                    {/* Review Form */}
                     <div className="md:w-1/3 w-full p-4 md:p-8 border-2 border-black m-2 mx-auto justify-center items-center rounded-lg shadow-lg">
                         <h2 className="text-xl md:text-2xl font-bold mb-4 text-center">Give Us Feedback</h2>
 
-                        {/* Rating Stars */}
-                        <div className="flex items-center mb-4 ">
+                        <div className="flex items-center mb-4">
                             <p className="mr-2 font-semibold">Rating:</p>
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <span
                                     key={star}
-                                    className={`text-2xl cursor-pointer ${star <= rating ? 'text-yellow-500' : 'text-gray-300'
-                                        }`}
-                                    onClick={() => handleStarClick(star)}
+                                    className={`text-2xl cursor-pointer ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                                    onClick={() => handleRatingChange(star)}
                                 >
                                     &#9733;
                                 </span>
                             ))}
                         </div>
 
-                        {/* Review Text Area */}
                         <textarea
                             className="shadow appearance-none border border-solid border-black rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
                             placeholder="Write your review here..."
                             onChange={(e) => setReviewText(e.target.value)}
+                            value={reviewText}
                         ></textarea>
 
-                        {/* Submit Button */}
                         <button
                             className="bg-green-500 hover:bg-green-700 w-full text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline"
                             onClick={() => setIsReviewModalOpen(true)}
+                            disabled={!rating || !reviewText}
                         >
                             Submit
                         </button>
                     </div>
 
-                    {/* View Reviews Section */}
                     <div className="md:w-1/2 mx-auto border-2 border-black w-full p-4 md:p-8 m-2 bg-white rounded-lg shadow-lg flex flex-wrap">
                         <h2 className="text-xl md:text-2xl font-bold text-center w-full mb-4">User Reviews</h2>
 
                         {reviews.length > 0 ? (
-                            reviews.slice(0, 4).reverse().map((review) => (
+                            reviews.slice(0, 4).map((review) => (
                                 <div key={review._id} className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 p-2">
                                     <div className="border-2 border-solid border-gray-300 p-4 rounded-lg">
                                         <p className='font-semibold'>{review.user.userName}</p>
@@ -347,104 +383,96 @@ const BookingForm = () => {
                                                 ))}
                                             </div>
                                         </div>
-
-                                        {/* User Review Text */}
                                         <p className="text-gray-700" style={{ wordWrap: 'break-word' }}>{review.review}</p>
                                     </div>
-
                                 </div>
                             ))
                         ) : (
-                            <p>No reviews available for this futsal.</p>
+                            <p className="w-full text-center">No reviews available for this futsal.</p>
                         )}
                     </div>
-
                 </div>
 
-                {
-                    futsal?.latitude && <MapContainer
+                {futsal?.latitude && futsal?.longitude && (
+                    <MapContainer
                         className="h-[500px] w-full mt-6"
-                        center={[futsal?.latitude, futsal?.longitude]}
-                        zoom={25}
+                        center={[futsal.latitude, futsal.longitude]}
+                        zoom={15}
+                        scrollWheelZoom={false}
                     >
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />   
-                        <Marker position={[futsal?.latitude, futsal?.longitude]} icon={defaultIcon}>
+                        <Marker position={[futsal.latitude, futsal.longitude]} icon={defaultIcon}>
                             <Popup>
                                 <div>
                                     <h1>{futsal.futsalName}</h1>
                                     <p>{futsal.futsalLocation}</p>
-                                    <img src={futsal.futsalImageUrl} alt={futsal.futsalName} />
+                                    <img src={futsal.futsalImageUrl} alt={futsal.futsalName} className="w-full h-auto" />
                                 </div>
                             </Popup>
                         </Marker>
                     </MapContainer>
+                )}
 
-                }
-
-
-
-
-
-
-
-                {/* Confirmation Modal */}
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
-                        <div className="bg-white p-5 rounded-lg shadow-xl">
-                            <h2 className="text-xl font-bold mb-4">Confirm Booking???</h2>
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50">
+                        <div className="bg-white p-5 rounded-lg shadow-xl max-w-md w-full">
+                            <h2 className="text-xl font-bold mb-4">Confirm Booking</h2>
                             <p><strong>Date:</strong> {date}</p>
                             <p><strong>Time:</strong> {selectedTimes.map(option => option.label).join(", ")}</p>
-                            {/* Include other details as needed */}
                             <div className="mt-4 flex justify-end space-x-3">
-                                <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" onClick={confirmBooking}>Confirm</button>
-                                <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                                <button 
+                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                    onClick={confirmBooking}
+                                >
+                                    Confirm
+                                </button>
+                                <button 
+                                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                                    onClick={() => setIsModalOpen(false)}
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {isReviewModalOpen && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
-                        <div className="bg-white p-5 rounded-lg shadow-xl">
-                            <h2 className="text-xl font-bold mb-4">Give Us Feedback</h2>
-                            {/* Rating Stars */}
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-50">
+                        <div className="bg-white p-5 rounded-lg shadow-xl max-w-md w-full">
+                            <h2 className="text-xl font-bold mb-4">Confirm Your Review</h2>
                             <div className="flex items-center mb-4">
                                 <p className="mr-2 font-semibold">Rating:</p>
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <span
                                         key={star}
-                                        className={`text-2xl cursor-pointer ${star <= rating ? 'text-yellow-500' : 'text-gray-300'
-                                            }`}
-                                        onClick={() => handleStarClick(star)}
+                                        className={`text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
                                     >
                                         &#9733;
                                     </span>
                                 ))}
                             </div>
-
-                            {/* Review Text Area */}
-                            <textarea
-                                className="shadow appearance-none border border-solid border-black rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
-                                placeholder="Write your review here..."
-
-                            >{reviewText}</textarea>
-
-                            {/* Submit Button */}
-                            <button
-                                className="bg-green-500 hover:bg-green-700 w-full text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline"
-                                onClick={handleReviewSubmit}
-                            >
-                                Submit Review
-                            </button>
-
-
+                            <p className="mb-4"><strong>Review:</strong> {reviewText}</p>
+                            <div className="mt-4 flex justify-end space-x-3">
+                                <button
+                                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+                                    onClick={handleReviewSubmit}
+                                >
+                                    Submit Review
+                                </button>
+                                <button
+                                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                                    onClick={() => setIsReviewModalOpen(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
-
             </div>
             <Footer />
         </>

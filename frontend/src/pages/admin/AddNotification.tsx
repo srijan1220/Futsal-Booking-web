@@ -8,7 +8,7 @@ import AdminNavbar from '../../components/AdminNavbar';
 import AdminSidebar from './AdminSidebar';
 
 const AddNotification = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user")||"null");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState('');
@@ -171,7 +171,7 @@ const AddNotification = () => {
                                                     id="description"
                                                     onChange={(e) => setDescription(e.target.value)}
                                                     className="mt-1 block w-full border border-solid border-gray-300 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                                                    rows="4"
+                                                    rows={4}
                                                     required
                                                 ></textarea>
                                             </div>
